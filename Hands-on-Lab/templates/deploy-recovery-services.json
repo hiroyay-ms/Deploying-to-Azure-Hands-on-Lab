@@ -1,0 +1,53 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vaultName": {
+            "type": "string",
+            "defaultValue": "RecoveryServicesVault",
+            "metadata": {
+                "description": "Recovery Services の名前"
+            }
+        },
+        "storageType": {
+            "type": "string",
+            "defaultValue": "GeoRedundant",
+            "allowedValues": [
+                "LocallyRedundant",
+                "GeoRedundant"
+            ],
+            "metadata": {
+                "description": "ストレージの冗長オプション"
+            }
+        }
+    },
+    "variables": {
+        "location": "[resourceGroup().location]"
+    },
+    "resources": [
+        {
+            "name": "[parameters('vaultName')]",
+            "type": "Microsoft.RecoveryServices/vaults",
+            "apiVersion": "2020-02-02",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "RS0",
+                "tier": "Standard"
+            },
+            "properties": {
+            }
+        },
+        {
+            "name": "[concat(parameters('vaultName'), '/vaultstorageconfig')]",
+            "type": "Microsoft.RecoveryServices/vaults/backupstorageconfig",
+            "apiVersion": "2020-02-02",
+            "dependsOn": [
+                "[resourceId('Microsoft.RecoveryServices/vaults', parameters('vaultName'))]"
+            ],
+            "properties": {
+                "StorageModelType": "[parameters('storageType')]"
+            }
+        }
+    ],
+    "outputs": {}
+}
