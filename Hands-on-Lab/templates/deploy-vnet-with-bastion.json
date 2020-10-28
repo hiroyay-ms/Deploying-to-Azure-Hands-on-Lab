@@ -1,0 +1,139 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "vnetName": {
+        "type": "string",
+        "defaultValue": "VNet1",
+        "metadata": {
+          "description": "仮想ネットワーク名"
+        }
+      },
+      "vnetAddressPrefix": {
+        "type": "string",
+        "defaultValue": "10.1.0.0/16",
+        "metadata": {
+          "description": "仮想ネットワークの IPv4 アドレス空間"
+        }
+      },
+      "bastionSubnetName": {
+          "type": "string",
+          "defaultValue": "AzureBastionSubnet",
+          "metadata": {
+              "description": "Azure Bastion を展開するサブネットの名前"
+          }
+      },
+      "bastionSubnetPrefix": {
+          "type": "string",
+          "defaultValue": "10.1.0.0/24",
+          "metadata": {
+              "description": "Azure Bastion を展開するサブネット アドレス範囲"
+          }
+      },
+      "subnet1Name": {
+        "type": "string",
+        "defaultValue": "Subnet-1",
+        "metadata": {
+          "description": "Subnet 1 の名前"
+        }
+      },
+      "subnet1Prefix": {
+        "type": "string",
+        "defaultValue": "10.1.1.0/24",
+        "metadata": {
+          "description": "Subnet 1 のサブネット アドレス範囲"
+        }
+      },
+      "bastionHostName": {
+        "type": "string",
+        "defaultValue": "Bastion-host",
+        "metadata": {
+          "description": "Azure Bustion の名前"
+        }
+      }
+    },
+    "variables": {
+      "location": "[resourceGroup().location]",
+
+      "bastionIPAddress": "[concat(parameters('bastionHostName'), '-NIC')]"
+    },
+    "resources": [
+      {
+        "apiVersion": "2018-10-01",
+        "type": "Microsoft.Network/virtualNetworks",
+        "name": "[parameters('vnetName')]",
+        "location": "[variables('location')]",
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "[parameters('vnetAddressPrefix')]"
+            ]
+          }
+        },
+        "resources": [
+          {
+              "apiVersion": "2018-10-01",
+              "type":"subnets",
+              "location": "[variables('location')]", 
+              "name": "[parameters('bastionSubnetName')]",
+              "dependsOn": [
+                "[parameters('vnetName')]"
+              ],
+              "properties": {
+                  "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+              }
+          },
+          {
+            "apiVersion": "2018-10-01",
+            "type": "subnets",
+            "location": "[variables('location')]",
+            "name": "[parameters('subnet1Name')]",
+            "dependsOn": [
+              "[parameters('vnetName')]"
+            ],
+            "properties": {
+                "addressPrefix": "[parameters('subnet1Prefix')]"
+            }
+          }
+        ]
+      },
+      {
+        "type": "Microsoft.Network/publicIpAddresses",
+        "apiVersion": "2019-02-01",
+        "name": "[variables('bastionIPAddress')]",
+        "location": "[variables('location')]",
+        "sku": {
+          "name": "Standard"
+        },
+        "properties": {
+          "publicIPAllocationMethod": "Static"
+        }
+      },
+      {
+        "type": "Microsoft.Network/bastionHosts",
+        "apiVersion": "2018-10-01",
+        "name": "[parameters('bastionHostName')]",
+        "location": "[variables('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/publicIpAddresses', variables('bastionIPAddress'))]",
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+          "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('bastionSubnetName'))]"
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "Ipconfig",
+              "properties": {
+                "subnet": {
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('bastionSubnetName'))]"
+                },
+                "publicIPAddress": {
+                  "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('bastionIPAddress'))]"
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }

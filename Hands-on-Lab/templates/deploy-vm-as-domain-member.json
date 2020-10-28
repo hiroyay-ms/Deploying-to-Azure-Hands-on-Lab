@@ -1,0 +1,185 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetworkId": {
+            "type": "string",
+            "metadata": {
+                "description": "仮想マシンを展開する仮想ネットワーク名"
+            }
+        },
+        "subnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "仮想マシンを展開するサブネット名"
+            }
+        },
+        "virtualMachineName": {
+            "type": "string",
+            "defaultValue": "Web-SVR",
+            "metadata": {
+                "description": "Web サーバー名"
+            }
+        },
+        "windowsOSVersion": {
+            "type": "string",
+            "defaultValue": "2019-Datacenter",
+            "allowedValues": [
+                "2012-R2-Datacenter",
+                "2016-Datacenter",
+                "2019-Datacenter",
+                "2019-Datacenter-smalldisk"
+            ],
+            "metadata": {
+                "description": "Web サーバーの OS バージョン"
+            }
+        },
+        "virtualMachineSize": {
+            "type": "string",
+            "defaultValue": "Standard_D2s_v3",
+            "allowedValues": [
+                "Standard_D2s_v3",
+                "Standard_D4s_v3",
+                "Standard_D8s_v3"
+            ],
+            "metadata": {
+                "description": "仮想マシンのインスタンス サイズ"
+            }
+        },
+        "domainToJoin": {
+            "type": "string",
+            "defaultValue": "DNS ドメイン名（sample.local）",
+            "metadata": {
+                "description": "参加するドメイン名"
+            }
+        },
+        "domainUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "ドメイン ユーザー アカウント名"
+            }
+        },
+        "domainPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "ドメイン ユーザー パスワード"
+            }
+        },
+        "adminUsername": {
+            "type": "string", 
+            "defaultValue": "AzureUser",
+            "metadata": {
+                "description": "ローカルの管理者名"
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "ローカルの管理者のパスワード"
+            }
+        }
+    },
+    "variables": {
+        "location": "[resourceGroup().location]",
+
+        "subnetRef": "[resourceID(resourceGroup().name, 'Microsoft.Network/virtualNetWorks/subnets', parameters('virtualNetworkId'), parameters('subnetName'))]",
+
+        "networkInterface": "[concat(parameters('virtualMachineName'), '-NIC')]",
+
+        "imagePublisher": "MicrosoftWindowsServer",
+        "imageOffer": "WindowsServer"
+    },
+    "resources": [
+        {
+            "name": "[variables('networkInterface')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-07-01",
+            "location": "[variables('location')]",
+            "dependsOn": [],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-03-01",
+            "name": "[parameters('virtualMachineName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterface'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "FromImage",
+                        "name": "[concat(parameters('virtualMachineName'), '-osDisk')]",
+                        "caching": "None",
+                        "managedDisk": {
+                            "storageAccountType": "StandardSSD_LRS"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "[variables('imagePublisher')]",
+                        "offer": "[variables('imageOffer')]",
+                        "sku": "[parameters('windowsOSVersion')]",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterface'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachineName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVMAgent": true
+                    }
+                }
+            },
+            "resources": [
+                {
+                    "type": "extensions",
+                    "apiVersion": "2015-06-15",
+                    "name": "JoinDomainVM",
+                    "location": "[variables('location')]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
+                    ],
+                    "properties": {
+                        "publisher": "Microsoft.Compute",
+                        "type": "JsonADDomainExtension",
+                        "typeHandlerVersion": "1.3",
+                        "settings": {
+                            "Name": "[parameters('domainToJoin')]",
+                            "User": "[concat(parameters('domainUsername'), '@' , parameters('domainToJoin'))]",
+                            "Restart": true,
+                            "Options": 3
+                        },
+                        "protectedSettings": {
+                            "Password": "[parameters('domainPassword')]"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
