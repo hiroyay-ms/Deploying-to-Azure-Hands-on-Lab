@@ -1,0 +1,27 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetworkId": {
+            "value": "VNet1"
+        },
+        "subnetName": {
+            "value": "Subnet-2"
+        },
+        "virtualMachineName": {
+            "value": "MyVM"
+        },
+        "domainToJoin": {
+            "value": "msuesaka.com"
+        },
+        "domainUsername": {
+            "value": "uesaka"
+        },
+        "domainPassword": {
+            "value": "R130096@1234"
+        },
+        "adminPassword": {
+            "value": "R130096@1234"
+        }
+    }
+}
