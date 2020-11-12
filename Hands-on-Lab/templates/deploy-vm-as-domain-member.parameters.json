@@ -9,7 +9,7 @@
             "value": "Subnet-2" 
         },
         "virtualMachineName": {
-            "value": "Web-SVR-kaoda"
+            "value": "Web-SVR-kaichi"
         },
         "windowsOSVersion": {
             "value": "2016-Datacenter"
