@@ -1,4 +1,9 @@
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+
 name: Deploy To Another Region
 jobs:
   build-and-deploy:
