@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetworkId": {
+            "value": "VNet1" 
+        },
+        "subnetName": {
+            "value": "Subnet-2" 
+        },
+        "virtualMachineName": {
+            "value": "Web-SVR-ryojise"
+        },
+        "windowsOSVersion": {
+            "value": "2016-Datacenter"
+        },
+        "virtualMachineSize": {
+            "value": "Standard_D2s_v3"
+        },
+        "domainToJoin": {
+            "value": "mcw.local"
+        },
+        "domainUsername": {
+            "value": "domainAdmin" 
+        },
+        "domainPassword": {
+            "value": "Password.1!!" 
+        },
+        "adminUsername": {
+            "value": "AzureUser"
+        },
+        "adminPassword": {
+            "value": "Password.1!!" 
+        }
+    }
+}
