@@ -9,7 +9,7 @@
             "value": "Subnet-2" 
         },
         "virtualMachineName": {
-            "value": "Web-SVR-ryojise"
+            "value": "Web-SVR-ryojise1"
         },
         "windowsOSVersion": {
             "value": "2016-Datacenter"
