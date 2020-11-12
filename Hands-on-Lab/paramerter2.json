@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetworkId": {
+            "value": "VNet1"
+        },
+        "subnetName": {
+            "value": "Subnet-1"
+        },
+        "adminPassword": {
+            "value": "R130096@1234"
+        }
+    }
+}
