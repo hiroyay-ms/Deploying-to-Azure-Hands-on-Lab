@@ -15,7 +15,7 @@
             "value": "2019-Datacenter"
         },
         "virtualMachineSize": {
-            "value": "Standard_D2s_v3"
+            "value": "Standard_E2s_v3"
         },
         "domainToJoin": {
             "value": "mcw.local"
