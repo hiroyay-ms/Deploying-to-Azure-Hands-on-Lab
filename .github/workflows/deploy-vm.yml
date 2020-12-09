@@ -17,15 +17,28 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # ジョブの名前
+  # ジョブの名前はメンバーで重複しないように指定
   deploy-virtual-machine:
-    # ワーフローの実行環境の指定
     runs-on: ubuntu-latest
 
     steps:
-      # コードをチェックアウト
       - uses: actions/checkout@v2
 
-      # スクリプトの実行（画面に指定したパラメーターの値を表示）
-      - name: Run a one-line script
-        run: echo Hello, ${{ github.event.inputs.resourceGroupName }}
+      # 登録したシークレットで Azure へログイン
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Azure CLI を使用し ARM テンプレートから仮想マシンを展開
+      - name: Deploy ARM Template
+        uses: azure/CLI@v1
+        with:
+          # {parameter file} には先の手順で作成したパラメーター ファイル名を指定
+          inlineScript: |
+            az deployment group create --resource-group ${{ github.event.inputs.resourceGroupName }} --template-file ./Hands-on-Lab/templates/deploy-vm-as-domain-member.json --parameters {parameter file}
+
+      # ログアウト
+      - name: Azure logout
+        run: |
+          az logout
