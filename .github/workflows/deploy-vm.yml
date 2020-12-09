@@ -1,0 +1,31 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Deploy Virtual Machine
+
+# Controls when the action will run. 
+on: 
+  # 手動ワークフロー トリガー
+  workflow_dispatch:
+    # ワークフロー実行時に使用するパラメーターを定義
+    inputs:
+      # パラメーター名
+      resourceGroupName: rg-lac-ohnuma
+      # ワークフロー実行時に画面に表示される名前
+      description: Resource Group Name
+      # 入力を必須に指定
+      required: true
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # ジョブの名前
+  deploy-virtual-machine:
+    # ワーフローの実行環境の指定
+    runs-on: ubuntu-latest
+
+    steps:
+      # コードをチェックアウト
+      - uses: actions/checkout@v2
+
+      # スクリプトの実行（画面に指定したパラメーターの値を表示）
+      - name: Run a one-line script
+        run: echo Hello, ${{ github.event.inputs.resourceGroupName }}
