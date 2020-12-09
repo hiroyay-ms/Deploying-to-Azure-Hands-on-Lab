@@ -1,0 +1,43 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Deploy VNet with Bastion
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  deploy-vnet-with-bastion:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # 登録したシークレットで Azure へログイン
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Azure CLI を使用し ARM テンプレートから仮想マシンを展開
+      - name: Deploy ARM Template
+        uses: azure/CLI@v1
+        with:
+          # {parameter file} には先の手順で作成したパラメーター ファイル名を指定
+          inlineScript: |
+            az deployment group create --resource-group rg-lac-ohnuma-jw --template-file ./Hands-on-Lab/templates/deploy-vnet-with-bastion.json --parameters ./Hands-on-Lab/templates/deploy-vnet-with-bastion.parameters.json
+
+      # ログアウト
+      - name: Azure logout
+        run: |
+          az logout
