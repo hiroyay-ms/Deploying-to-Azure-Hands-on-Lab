@@ -3,22 +3,22 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vnetName": {
-            "value": "VNet1"
+            "value": "vnet-lac-ohnuma-jw"
         },
         "vnetAddressPrefix": {
-            "value": "10.1.0.0/16"
+            "value": "10.129.0.0/16"
         },
         "bastionSubnetName": {
             "value": "AzureBastionSubnet"
         },
         "bastionSubnetPrefix": {
-            "value": "10.1.0.0/24"
+            "value": "10.129.0.0/24"
         },
         "subnet1Name": {
             "value": "Subnet-1"
         },
         "subnet1Prefix": {
-            "value": "10.1.1.0/24"
+            "value": "10.129.1.0/24"
         },
         "bastionHostName": {
             "value": "Bastion-host"
