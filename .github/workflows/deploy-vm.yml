@@ -36,7 +36,7 @@ jobs:
         with:
           # {parameter file} には先の手順で作成したパラメーター ファイル名を指定
           inlineScript: |
-            az deployment group create --resource-group ${{ github.event.inputs.resourceGroupName }} --template-file ./Hands-on-Lab/templates/deploy-vm-as-domain-member.json --parameters {parameter file}
+            az deployment group create --resource-group ${{ github.event.inputs.resourceGroupName }} --template-file ./Hands-on-Lab/templates/deploy-vm-as-domain-member.json --parameters./Hands-on-Lab/templates/deploy-vm-as-domain-member.parameters.json
 
       # ログアウト
       - name: Azure logout
