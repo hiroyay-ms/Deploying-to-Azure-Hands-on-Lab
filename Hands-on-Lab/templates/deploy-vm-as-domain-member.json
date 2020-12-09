@@ -14,6 +14,12 @@
                 "description": "仮想マシンを展開するサブネット名"
             }
         },
+        "vnetResourceGroup": {
+            "type": "string",
+            "metadata": {
+                "description": "仮想ネットワークが所属する仮想ネットワーク名"
+            }
+        },
         "virtualMachineName": {
             "type": "string",
             "defaultValue": "Web-SVR",
@@ -82,7 +88,7 @@
     "variables": {
         "location": "[resourceGroup().location]",
 
-        "subnetRef": "[resourceID(resourceGroup().name, 'Microsoft.Network/virtualNetWorks/subnets', parameters('virtualNetworkId'), parameters('subnetName'))]",
+        "subnetRef": "[resourceID(parameters('vnetResourceGroup'), 'Microsoft.Network/virtualNetWorks/subnets', parameters('virtualNetworkId'), parameters('subnetName'))]",
 
         "networkInterface": "[concat(parameters('virtualMachineName'), '-NIC')]",
 
