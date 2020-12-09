@@ -9,11 +9,11 @@ on:
     # ワークフロー実行時に使用するパラメーターを定義
     inputs:
       # パラメーター名
-      resourceGroupName: rg-lac-ohnuma
-      # ワークフロー実行時に画面に表示される名前
-      description: Resource Group Name
-      # 入力を必須に指定
-      required: true
+      resourceGroupName: 
+        # ワークフロー実行時に画面に表示される名前
+        description: Resource Group Name
+        # 入力を必須に指定
+        required: true
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
